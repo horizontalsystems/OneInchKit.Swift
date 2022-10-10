@@ -2,6 +2,7 @@ import Foundation
 import BigInt
 import EvmKit
 import HsToolKit
+import HsExtensions
 
 struct SwapTransactionMapper: IApiMapper {
     typealias T = SwapTransaction
@@ -22,7 +23,7 @@ struct SwapTransactionMapper: IApiMapper {
               let toString = map["to"] as? String,
               let to = try? Address(hex: toString),
               let dataString = map["data"] as? String,
-              let data = Data(hex: dataString),
+              let data = dataString.hs.hexData,
               let valueSting = map["value"] as? String,
               let value = BigUInt(valueSting, radix: 10),
               let gasLimit = map["gas"] as? Int else {

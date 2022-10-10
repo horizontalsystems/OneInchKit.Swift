@@ -2,6 +2,7 @@ import Foundation
 import BigInt
 import EvmKit
 import HsToolKit
+import HsExtensions
 
 struct ApproveCallDataMapper: IApiMapper {
     typealias T = ApproveCallData
@@ -12,7 +13,7 @@ struct ApproveCallDataMapper: IApiMapper {
         }
 
         guard let dataString = map["data"] as? String,
-              let data = Data(hex: dataString),
+              let data = dataString.hs.hexData,
               let toString = map["to"] as? String,
               let to = try? Address(hex: toString),
               let gasPriceString = map["gasPrice"] as? String,

@@ -1,6 +1,7 @@
 import Foundation
 import BigInt
 import EvmKit
+import HsExtensions
 
 public struct SwapTransaction {
     public let from: Address
@@ -25,7 +26,7 @@ public struct SwapTransaction {
 extension SwapTransaction: CustomStringConvertible {
 
     public var description: String {
-        "[SwapTransaction {from \(from.hex); to: \(to.hex); data: \(data.hex); value: \(value.description); gasPrice: \(gasPrice); gasLimit: \(gasLimit)]"
+        "[SwapTransaction {from \(from.hex); to: \(to.hex); data: \(data.hs.hex); value: \(value.description); gasPrice: \(gasPrice); gasLimit: \(gasLimit)]"
     }
 
 }
