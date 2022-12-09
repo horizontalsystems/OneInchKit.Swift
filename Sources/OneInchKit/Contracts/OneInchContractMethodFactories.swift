@@ -6,9 +6,12 @@ class OneInchContractMethodFactories: ContractMethodFactories {
     override init() {
         super.init()
         register(factories: [
-            UnoswapMethodFactory(),
-            SwapMethodFactory(),
-            OneInchV4MethodsFactory()
+            UnoswapMethodFactoryV4(),
+            SwapMethodFactoryV4(),
+            UnparsedSwapMethodsFactoryV4(),
+            UnoswapMethodFactoryV5(),
+            SwapMethodFactoryV5(),
+            UnparsedSwapMethodsFactoryV5(),
         ])
     }
 

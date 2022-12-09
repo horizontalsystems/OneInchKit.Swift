@@ -2,8 +2,8 @@ import Foundation
 import BigInt
 import EvmKit
 
-class UnoswapMethodFactory: IContractMethodFactory {
-    let methodId: Data = ContractMethodHelper.methodId(signature: UnoswapMethod.methodSignature)
+class UnoswapMethodFactoryV4: IContractMethodFactory {
+    let methodId: Data = ContractMethodHelper.methodId(signature: UnoswapMethodV4.methodSignature)
 
     func createMethod(inputArguments: Data) throws -> ContractMethod {
         let parsedArguments = ContractMethodHelper.decodeABI(inputArguments: inputArguments, argumentTypes: [Address.self, BigUInt.self, BigUInt.self, [Data].self])
@@ -14,7 +14,7 @@ class UnoswapMethodFactory: IContractMethodFactory {
             throw ContractMethodFactories.DecodeError.invalidABI
         }
 
-        return UnoswapMethod(srcToken: srcToken, amount: amount, minReturn: minReturn, params: params)
+        return UnoswapMethodV4(srcToken: srcToken, amount: amount, minReturn: minReturn, params: params)
     }
 
 }

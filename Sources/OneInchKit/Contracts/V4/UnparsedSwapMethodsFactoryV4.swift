@@ -2,7 +2,7 @@ import Foundation
 import BigInt
 import EvmKit
 
-class OneInchV4MethodsFactory: IContractMethodsFactory {
+class UnparsedSwapMethodsFactoryV4: IContractMethodsFactory {
     var methodId: Data { Data() }
     let methodIds: [Data] = [
         ContractMethodHelper.methodId(signature: "fillOrderRFQ((uint256,address,address,address,address,uint256,uint256),bytes,uint256,uint256)"),
@@ -18,7 +18,7 @@ class OneInchV4MethodsFactory: IContractMethodsFactory {
     ]
 
     func createMethod(inputArguments: Data) throws -> ContractMethod {
-        OneInchV4Method()
+        UnparsedSwapMethodV4()
     }
 
 }

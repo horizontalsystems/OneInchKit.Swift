@@ -2,7 +2,7 @@ import Foundation
 import BigInt
 import EvmKit
 
-class SwapMethod: ContractMethod {
+class SwapMethodV4: ContractMethod {
     static let methodSignature = "swap(address,(address,address,address,address,uint256,uint256,uint256,bytes),bytes)"
 
     let caller: Address
@@ -17,7 +17,7 @@ class SwapMethod: ContractMethod {
         super.init()
     }
 
-    override var methodSignature: String { SwapMethod.methodSignature }
+    override var methodSignature: String { SwapMethodV4.methodSignature }
 
     override var arguments: [Any] {
         [caller, swapDescription, data]

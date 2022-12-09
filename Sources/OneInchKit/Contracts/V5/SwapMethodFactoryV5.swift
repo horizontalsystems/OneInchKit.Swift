@@ -2,13 +2,14 @@ import Foundation
 import BigInt
 import EvmKit
 
-class SwapMethodFactory: IContractMethodFactory {
-    let methodId: Data = ContractMethodHelper.methodId(signature: SwapMethod.methodSignature)
+class SwapMethodFactoryV5: IContractMethodFactory {
+    let methodId: Data = ContractMethodHelper.methodId(signature: SwapMethodV5.methodSignature)
 
     func createMethod(inputArguments: Data) throws -> ContractMethod {
         let argumentTypes: [Any] =  [
             Address.self,
-            ContractMethodHelper.StructParameter([Address.self, Address.self, Address.self, Address.self, BigUInt.self, BigUInt.self, BigUInt.self, Data.self]),
+            ContractMethodHelper.StaticStructParameter([Address.self, Address.self, Address.self, Address.self, BigUInt.self, BigUInt.self, BigUInt.self]),
+            Data.self,
             Data.self
         ]
         let parsedArguments = ContractMethodHelper.decodeABI(inputArguments: inputArguments, argumentTypes: argumentTypes)
@@ -23,24 +24,22 @@ class SwapMethodFactory: IContractMethodFactory {
               let amount = swapDescriptionArguments[4] as? BigUInt,
               let minReturnAmount = swapDescriptionArguments[5] as? BigUInt,
               let flags = swapDescriptionArguments[6] as? BigUInt,
-              let permit = swapDescriptionArguments[7] as? Data,
-
-              let data = parsedArguments[2] as? Data else {
+              let permit = parsedArguments[2] as? Data,
+              let data = parsedArguments[3] as? Data else {
             throw ContractMethodFactories.DecodeError.invalidABI
         }
 
-        let swapDescription = SwapMethod.SwapDescription(
+        let swapDescription = SwapMethodV5.SwapDescription(
                 srcToken: srcToken,
                 dstToken: dstToken,
                 srcReceiver: srcReceiver,
                 dstReceiver: dstReceiver,
                 amount: amount,
                 minReturnAmount: minReturnAmount,
-                flags: flags,
-                permit: permit
+                flags: flags
         )
 
-        return SwapMethod(caller: caller, swapDescription: swapDescription, data: data)
+        return SwapMethodV5(caller: caller, swapDescription: swapDescription, permit: permit, data: data)
     }
 
 }

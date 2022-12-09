@@ -75,7 +75,7 @@ extension OneInchTransactionDecorator: ITransactionDecorator {
         }
 
         switch contractMethod {
-        case let method as SwapMethod:
+        case let method as SwapMethodV4:
             let swapDescription = method.swapDescription
             let tokenOut = addressToToken(address: swapDescription.dstToken, eventInstances: eventInstances)
 
@@ -105,7 +105,7 @@ extension OneInchTransactionDecorator: ITransactionDecorator {
                     recipient: swapDescription.dstReceiver == from ? nil : swapDescription.dstReceiver
             )
 
-        case let method as UnoswapMethod:
+        case let method as UnoswapMethodV4:
             var tokenOut: OneInchDecoration.Token?
             var amountOut: OneInchDecoration.Amount = .extremum(value: method.minReturn)
 
@@ -137,7 +137,69 @@ extension OneInchTransactionDecorator: ITransactionDecorator {
                     params: method.params
             )
 
-        case is OneInchV4Method:
+        case let method as SwapMethodV5:
+            let swapDescription = method.swapDescription
+            let tokenOut = addressToToken(address: swapDescription.dstToken, eventInstances: eventInstances)
+
+            var amountOut: OneInchDecoration.Amount = .extremum(value: swapDescription.minReturnAmount)
+
+            switch tokenOut {
+            case .evmCoin:
+                if !internalTransactions.isEmpty {
+                    amountOut = .exact(value: totalEthIncoming(userAddress: swapDescription.dstReceiver, internalTransactions: internalTransactions))
+                }
+            case .eip20Coin:
+                let totalAmount = totalAmount(tokenAddress: swapDescription.dstToken, transfers: incomingTransfers(userAddress: swapDescription.dstReceiver, eventInstances: eventInstances))
+                if totalAmount != 0 {
+                    amountOut = .exact(value: totalAmount)
+                }
+            }
+
+            return OneInchSwapDecoration(
+                    contractAddress: to,
+                    tokenIn: addressToToken(address: swapDescription.srcToken, eventInstances: eventInstances),
+                    tokenOut: tokenOut,
+                    amountIn: swapDescription.amount,
+                    amountOut: amountOut,
+                    flags: swapDescription.flags,
+                    permit: method.permit,
+                    data: method.data,
+                    recipient: swapDescription.dstReceiver == from ? nil : swapDescription.dstReceiver
+            )
+
+        case let method as UnoswapMethodV5:
+            var tokenOut: OneInchDecoration.Token?
+            var amountOut: OneInchDecoration.Amount = .extremum(value: method.minReturn)
+
+            if !internalTransactions.isEmpty {
+                let amount = totalEthIncoming(userAddress: address, internalTransactions: internalTransactions)
+
+                if amount > 0 {
+                    tokenOut = .evmCoin
+                    amountOut = .exact(value: amount)
+                }
+            }
+
+            let incomingTransfers = incomingTransfers(userAddress: address, eventInstances: eventInstances)
+            if tokenOut == nil, let firstTransfer = incomingTransfers.first {
+                let amount = totalAmount(tokenAddress: firstTransfer.contractAddress, transfers: incomingTransfers)
+
+                if amount > 0 {
+                    tokenOut = addressToToken(address: firstTransfer.contractAddress, eventInstances: eventInstances)
+                    amountOut = .exact(value: amount)
+                }
+            }
+
+            return OneInchUnoswapDecoration(
+                    contractAddress: to,
+                    tokenIn: addressToToken(address: method.srcToken, eventInstances: eventInstances),
+                    tokenOut: tokenOut,
+                    amountIn: method.amount,
+                    amountOut: amountOut,
+                    params: []
+            )
+
+        case is UnparsedSwapMethodV4, is UnparsedSwapMethodV5:
             var totalInternalValue: BigUInt = 0
 
             for internalTransaction in internalTransactions {

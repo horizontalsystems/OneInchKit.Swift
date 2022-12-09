@@ -4,7 +4,7 @@ import EvmKit
 
 // This method assumes that recipient is always the initiator of the transaction
 
-class UnoswapMethod: ContractMethod {
+class UnoswapMethodV4: ContractMethod {
     static let methodSignature = "unoswap(address,uint256,uint256,bytes32[])"
 
     let srcToken: Address
@@ -21,7 +21,7 @@ class UnoswapMethod: ContractMethod {
         super.init()
     }
 
-    override var methodSignature: String { UnoswapMethod.methodSignature }
+    override var methodSignature: String { UnoswapMethodV4.methodSignature }
 
     override var arguments: [Any] {
         [srcToken, amount, minReturn, params]
