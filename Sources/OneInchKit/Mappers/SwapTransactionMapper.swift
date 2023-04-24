@@ -1,23 +1,9 @@
-import Foundation
 import BigInt
 import EvmKit
-import HsToolKit
-import HsExtensions
 
-struct SwapTransactionMapper: IApiMapper {
-    typealias T = SwapTransaction
+struct SwapTransactionMapper {
 
-    private let tokenMapper: TokenMapper
-
-    init(tokenMapper: TokenMapper) {
-        self.tokenMapper = tokenMapper
-    }
-
-    func map(statusCode: Int, data: Any?) throws -> T {
-        guard let map = data as? [String: Any] else {
-            throw NetworkManager.RequestError.invalidResponse(statusCode: statusCode, data: data)
-        }
-
+    static func swapTransaction(map: [String: Any]) throws -> SwapTransaction {
         guard let fromString = map["from"] as? String,
               let from = try? Address(hex: fromString),
               let toString = map["to"] as? String,
@@ -27,8 +13,7 @@ struct SwapTransactionMapper: IApiMapper {
               let valueSting = map["value"] as? String,
               let value = BigUInt(valueSting, radix: 10),
               let gasLimit = map["gas"] as? Int else {
-
-            throw NetworkManager.RequestError.invalidResponse(statusCode: statusCode, data: data)
+            throw ResponseError.invalidJson
         }
 
         let gasPrice: GasPrice
@@ -39,16 +24,26 @@ struct SwapTransactionMapper: IApiMapper {
                   let maxPriorityFeePerGasString = map["maxPriorityFeePerGas"] as? String, let maxPriorityFeePerGas = Int(maxPriorityFeePerGasString) {
             gasPrice = .eip1559(maxFeePerGas: maxFeePerGas, maxPriorityFeePerGas: maxPriorityFeePerGas)
         } else {
-            throw NetworkManager.RequestError.invalidResponse(statusCode: statusCode, data: data)
+            throw ResponseError.invalidJson
         }
 
 
-        return T(from: from,
+        return SwapTransaction(
+                from: from,
                 to: to,
                 data: data,
                 value: value,
                 gasPrice: gasPrice,
-                gasLimit: gasLimit)
+                gasLimit: gasLimit
+        )
+    }
+
+}
+
+extension SwapTransactionMapper {
+
+    public enum ResponseError: Error {
+        case invalidJson
     }
 
 }
