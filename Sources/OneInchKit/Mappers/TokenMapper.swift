@@ -1,23 +1,23 @@
-import HsToolKit
+struct TokenMapper {
 
-public struct TokenMapper: IApiMapper {
-    public typealias T = Token
-
-    public func map(statusCode: Int, data: Any?) throws -> T {
-        guard let map = data as? [String: Any] else {
-            throw NetworkManager.RequestError.invalidResponse(statusCode: statusCode, data: data)
-        }
-
+    static func token(map: [String: Any]) throws -> Token {
         guard let symbol = map["symbol"] as? String,
               let name = map["name"] as? String,
               let decimals = map["decimals"] as? Int,
               let address = map["address"] as? String,
               let logoUri = map["logoURI"] as? String else {
-
-            throw NetworkManager.RequestError.invalidResponse(statusCode: statusCode, data: data)
+            throw ResponseError.invalidJson
         }
 
-        return T(symbol: symbol, name: name, decimals: decimals, address: address, logoUri: logoUri)
+        return Token(symbol: symbol, name: name, decimals: decimals, address: address, logoUri: logoUri)
+    }
+
+}
+
+extension TokenMapper {
+
+    public enum ResponseError: Error {
+        case invalidJson
     }
 
 }

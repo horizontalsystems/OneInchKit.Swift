@@ -1,11 +1,16 @@
 import Foundation
-import RxSwift
 import BigInt
 import EvmKit
 import HsToolKit
 
 class OneInchProvider {
-    private static let notEnoughEthErrors = ["Try to leave the buffer of ETH for gas", "you may not have enough ETH balance for gas fee", "Not enough ETH balance", "insufficient funds for transfer"]
+    private static let notEnoughEthErrors = [
+        "Try to leave the buffer of ETH for gas",
+        "you may not have enough ETH balance for gas fee",
+        "Not enough ETH balance",
+        "insufficient funds for transfer"
+    ]
+
     private let networkManager: NetworkManager
     private let chain: Chain
 
@@ -40,17 +45,9 @@ class OneInchProvider {
 
 extension OneInchProvider {
 
-    func quoteSingle(fromToken: Address,
-                     toToken: Address,
-                     amount: BigUInt,
-                     protocols: String? = nil,
-                     gasPrice: GasPrice? = nil,
-                     complexityLevel: Int? = nil,
-                     connectorTokens: String? = nil,
-                     gasLimit: Int? = nil,
-                     mainRouteParts: Int? = nil,
-                     parts: Int? = nil) -> Single<Quote> {
-
+    func quote(fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
+               connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil
+    ) async throws -> Quote {
        var parameters = params(dictionary:
        [
            "fromTokenAddress": fromToken,
@@ -73,38 +70,30 @@ extension OneInchProvider {
         case .none: ()
         }
 
-        let mapper = QuoteMapper(tokenMapper: TokenMapper())
-        return networkManager
-                .single(url: url + "v5.0/\(chain.id)/quote", method: .get, parameters: parameters, mapper: mapper, responseCacherBehavior: .doNotCache)
-                .catchError { error in
-                    if case let .invalidResponse(_, data) = (error as? NetworkManager.RequestError),
-                       let dictionary = data as? [String: Any],
-                       let message = dictionary["message"] as? String {
-                        if message.contains("insufficient liquidity") {
-                            return Single.error(Kit.QuoteError.insufficientLiquidity)
-                        }
-                    }
+        do {
+            let json = try await networkManager.fetchJson(url: url + "v5.0/\(chain.id)/quote", method: .get, parameters: parameters, responseCacherBehavior: .doNotCache)
 
-                    return Single.error(error)
-                }
+            guard let map = json as? [String: Any] else {
+                throw ResponseError.invalidJson
+            }
+
+            return try QuoteMapper.quote(map: map)
+        } catch {
+            if let responseError = error as? NetworkManager.ResponseError,
+               let dictionary = responseError.json as? [String: Any],
+               let message = dictionary["message"] as? String,
+               message.contains("insufficient liquidity") {
+                throw Kit.QuoteError.insufficientLiquidity
+            }
+
+            throw error
+        }
     }
 
-    func swapSingle(fromToken: String,
-                     toToken: String,
-                     amount: BigUInt,
-                     fromAddress: String,
-                     slippage: Decimal,
-                     protocols: String? = nil,
-                     recipient: String? = nil,
-                     gasPrice: GasPrice? = nil,
-                     burnChi: Bool? = nil,
-                     complexityLevel: Int? = nil,
-                     connectorTokens: String? = nil,
-                     allowPartialFill: Bool? = nil,
-                     gasLimit: Int? = nil,
-                     mainRouteParts: Int? = nil,
-                     parts: Int? = nil) -> Single<Swap> {
-
+    func swap(fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, protocols: String? = nil, recipient: String? = nil,
+              gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: String? = nil, allowPartialFill: Bool? = nil,
+              gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil
+    ) async throws -> Swap {
        var parameters = params(dictionary:
        [
            "fromTokenAddress": fromToken,
@@ -132,24 +121,35 @@ extension OneInchProvider {
         case .none: ()
         }
 
-        let tokenMapper = TokenMapper()
-        let mapper = SwapMapper(tokenMapper: tokenMapper, swapTransactionMapper: SwapTransactionMapper(tokenMapper: tokenMapper))
+        do {
+            let json = try await networkManager.fetchJson(url: url + "v5.0/\(chain.id)/swap", method: .get, parameters: parameters, responseCacherBehavior: .doNotCache)
 
-        return networkManager
-                .single(url: url + "v5.0/\(chain.id)/swap", method: .get, parameters: parameters, mapper: mapper, responseCacherBehavior: .doNotCache)
-                .catchError { error in
-                    if case let .invalidResponse(_, data) = (error as? NetworkManager.RequestError),
-                       let dictionary = data as? [String: Any],
-                       let message = dictionary["message"] as? String {
-                        if Self.notEnoughErrorContains(in: message) {
-                            return Single.error(Kit.SwapError.notEnough)
-                        } else if message.contains("cannot estimate") {
-                            return Single.error(Kit.SwapError.cannotEstimate)
-                        }
-                    }
+            guard let map = json as? [String: Any] else {
+                throw ResponseError.invalidJson
+            }
 
-                    return Single.error(error)
+            return try SwapMapper.swap(map: map)
+        } catch {
+            if let responseError = error as? NetworkManager.ResponseError,
+               let dictionary = responseError.json as? [String: Any],
+               let message = dictionary["message"] as? String {
+                if Self.notEnoughErrorContains(in: message) {
+                    throw Kit.SwapError.notEnough
+                } else if message.contains("cannot estimate") {
+                    throw Kit.SwapError.cannotEstimate
                 }
+            }
+
+            throw error
+        }
+    }
+
+}
+
+extension OneInchProvider {
+
+    public enum ResponseError: Error {
+        case invalidJson
     }
 
 }

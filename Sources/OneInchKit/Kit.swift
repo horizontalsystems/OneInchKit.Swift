@@ -1,5 +1,4 @@
 import Foundation
-import RxSwift
 import BigInt
 import EvmKit
 import HsToolKit
@@ -20,18 +19,10 @@ public class Kit {
 
 extension Kit {
 
-    public func quoteSingle(fromToken: Address,
-                            toToken: Address,
-                            amount: BigUInt,
-                            protocols: String? = nil,
-                            gasPrice: GasPrice? = nil,
-                            complexityLevel: Int? = nil,
-                            connectorTokens: String? = nil,
-                            gasLimit: Int? = nil,
-                            mainRouteParts: Int? = nil,
-                            parts: Int? = nil) -> Single<Quote> {
-
-        provider.quoteSingle(
+    public func quote(fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
+                      connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil
+    ) async throws -> Quote {
+        try await provider.quote(
                 fromToken: fromToken,
                 toToken: toToken,
                 amount: amount,
@@ -41,25 +32,15 @@ extension Kit {
                 connectorTokens: connectorTokens,
                 gasLimit: gasLimit,
                 mainRouteParts: mainRouteParts,
-                parts: parts)
+                parts: parts
+        )
     }
 
-    public func swapSingle(fromToken: Address,
-                    toToken: Address,
-                    amount: BigUInt,
-                    slippage: Decimal,
-                    protocols: [String]? = nil,
-                    recipient: Address? = nil,
-                    gasPrice: GasPrice? = nil,
-                    burnChi: Bool? = nil,
-                    complexityLevel: Int? = nil,
-                    connectorTokens: [String]? = nil,
-                    allowPartialFill: Bool? = nil,
-                    gasLimit: Int? = nil,
-                    mainRouteParts: Int? = nil,
-                    parts: Int? = nil) -> Single<Swap> {
-
-        provider.swapSingle(fromToken: fromToken.hex,
+    public func swap(fromToken: Address, toToken: Address, amount: BigUInt, slippage: Decimal, protocols: [String]? = nil, recipient: Address? = nil,
+                     gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: [String]? = nil,
+                     allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil
+    ) async throws -> Swap {
+        try await provider.swap(fromToken: fromToken.hex,
                 toToken: toToken.hex,
                 amount: amount,
                 fromAddress: evmKit.receiveAddress.hex,
