@@ -14,7 +14,7 @@ class OneInchProvider {
     private let networkManager: NetworkManager
     private let chain: Chain
 
-    private var url: String { "https://unstoppable.api.enterprise.1inch.exchange/" }
+    private var url: String { "https://api-unstoppable.1inch.io/" }
 
     init(networkManager: NetworkManager, chain: Chain) {
         self.networkManager = networkManager
