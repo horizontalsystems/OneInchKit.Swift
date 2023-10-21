@@ -11,11 +11,9 @@ struct QuoteMapper {
         let fromToken = try TokenMapper.token(map: fromTokenMap)
         let toToken = try TokenMapper.token(map: toTokenMap)
 
-        guard let toAmountString = map["toTokenAmount"] as? String,
+        guard let toAmountString = map["toAmount"] as? String,
               let toAmount = BigUInt(toAmountString, radix: 10),
-              let fromAmountString = map["fromTokenAmount"] as? String,
-              let fromAmount = BigUInt(fromAmountString, radix: 10),
-              let estimateGas = map["estimatedGas"] as? Int else {
+              let estimateGas = map["gas"] as? Int else {
             throw ResponseError.invalidJson
         }
 
@@ -23,7 +21,6 @@ struct QuoteMapper {
         return Quote(
                 fromToken: fromToken,
                 toToken: toToken,
-                fromTokenAmount: fromAmount,
                 toTokenAmount: toAmount,
                 route: [],                      // todo: parse "protocols"
                 estimateGas: estimateGas

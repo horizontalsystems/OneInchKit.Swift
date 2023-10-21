@@ -2,6 +2,7 @@ import Foundation
 import BigInt
 import EvmKit
 import HsToolKit
+import Alamofire
 
 class OneInchProvider {
     private static let notEnoughEthErrors = [
@@ -15,10 +16,13 @@ class OneInchProvider {
     private let chain: Chain
 
     private var url: String { "https://api-unstoppable.1inch.io/" }
+    private var headers: HTTPHeaders?
 
-    init(networkManager: NetworkManager, chain: Chain) {
+    init(networkManager: NetworkManager, chain: Chain, apiKey: String) {
         self.networkManager = networkManager
         self.chain = chain
+
+        headers = HTTPHeaders([HTTPHeader.authorization(bearerToken: apiKey)])
     }
 
     private func params(dictionary: [String: Any?]) -> [String: Any] {
@@ -46,12 +50,13 @@ class OneInchProvider {
 extension OneInchProvider {
 
     func quote(fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
-               connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil
+               connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
+               includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true
     ) async throws -> Quote {
        var parameters = params(dictionary:
        [
-           "fromTokenAddress": fromToken,
-           "toTokenAddress": toToken,
+           "src": fromToken,
+           "dst": toToken,
            "amount": amount.description,
            "protocols": protocols,
            "connectorTokens": connectorTokens,
@@ -59,6 +64,9 @@ extension OneInchProvider {
            "gasLimit": gasLimit,
            "mainRouteParts": mainRouteParts,
            "parts": parts,
+           "includeTokensInfo": includeTokensInfo,
+           "includeProtocols": includeProtocols,
+           "includeGas": includeGas
        ])
 
         switch gasPrice {
@@ -71,7 +79,7 @@ extension OneInchProvider {
         }
 
         do {
-            let json = try await networkManager.fetchJson(url: url + "v5.0/\(chain.id)/quote", method: .get, parameters: parameters, responseCacherBehavior: .doNotCache)
+            let json = try await networkManager.fetchJson(url: url + "v5.2/\(chain.id)/quote", method: .get, parameters: parameters, headers: headers, responseCacherBehavior: .doNotCache)
 
             guard let map = json as? [String: Any] else {
                 throw ResponseError.invalidJson
@@ -90,19 +98,21 @@ extension OneInchProvider {
         }
     }
 
-    func swap(fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, protocols: String? = nil, recipient: String? = nil,
-              gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: String? = nil, allowPartialFill: Bool? = nil,
-              gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil
+    func swap(fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, referrer: String? = nil, protocols: String? = nil,
+              recipient: String? = nil, gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: String? = nil,
+              allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
+              includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true
     ) async throws -> Swap {
        var parameters = params(dictionary:
        [
-           "fromTokenAddress": fromToken,
-           "toTokenAddress": toToken,
+           "src": fromToken,
+           "dst": toToken,
            "amount": amount.description,
-           "fromAddress": fromAddress,
+           "from": fromAddress,
            "slippage": slippage,
+           "referrer": referrer,
            "protocols": protocols,
-           "destReceiver": recipient,
+           "receiver": recipient,
            "burnChi": burnChi,
            "complexityLevel": complexityLevel,
            "connectorTokens": connectorTokens,
@@ -110,6 +120,9 @@ extension OneInchProvider {
            "gasLimit": gasLimit,
            "mainRouteParts": mainRouteParts,
            "parts": parts,
+           "includeTokensInfo": includeTokensInfo,
+           "includeProtocols": includeProtocols,
+           "includeGas": includeGas
        ])
 
         switch gasPrice {
@@ -122,7 +135,7 @@ extension OneInchProvider {
         }
 
         do {
-            let json = try await networkManager.fetchJson(url: url + "v5.0/\(chain.id)/swap", method: .get, parameters: parameters, responseCacherBehavior: .doNotCache)
+            let json = try await networkManager.fetchJson(url: url + "v5.2/\(chain.id)/swap", method: .get, parameters: parameters, headers: headers, responseCacherBehavior: .doNotCache)
 
             guard let map = json as? [String: Any] else {
                 throw ResponseError.invalidJson
