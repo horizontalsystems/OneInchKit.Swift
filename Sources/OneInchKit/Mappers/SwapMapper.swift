@@ -14,18 +14,15 @@ struct SwapMapper {
         let toToken = try TokenMapper.token(map: toTokenMap)
         let transaction = try SwapTransactionMapper.swapTransaction(map: transactionMap)
 
-        guard let toAmountString = map["toTokenAmount"] as? String,
-              let toAmount = BigUInt(toAmountString, radix: 10),
-              let fromAmountString = map["fromTokenAmount"] as? String,
-              let fromAmount = BigUInt(fromAmountString, radix: 10) else {
+        guard let toAmountString = map["toAmount"] as? String,
+              let toAmount = BigUInt(toAmountString, radix: 10) else {
+
             throw ResponseError.invalidJson
         }
-
 
         return Swap(
                 fromToken: fromToken,
                 toToken: toToken,
-                fromTokenAmount: fromAmount,
                 toTokenAmount: toAmount,
                 route: [],                      // todo: parse "protocols"
                 transaction: transaction

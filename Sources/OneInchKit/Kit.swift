@@ -61,14 +61,14 @@ extension Kit {
 
 extension Kit {
 
-    public static func instance(evmKit: EvmKit.Kit, minLogLevel: Logger.Level = .error) throws -> Kit {
+    public static func instance(evmKit: EvmKit.Kit, apiKey: String, minLogLevel: Logger.Level = .error) throws -> Kit {
         let logger = Logger(minLogLevel: minLogLevel)
         let networkManager = NetworkManager(logger: logger)
 
         let oneInchKit = Kit(
                 routerAddress: try routerAddress(chain: evmKit.chain),
                 evmKit: evmKit,
-                provider: OneInchProvider(networkManager: networkManager, chain: evmKit.chain)
+                provider: OneInchProvider(networkManager: networkManager, chain: evmKit.chain, apiKey: apiKey)
         )
 
         return oneInchKit
