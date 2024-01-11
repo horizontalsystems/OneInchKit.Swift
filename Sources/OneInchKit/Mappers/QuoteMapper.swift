@@ -1,10 +1,10 @@
 import BigInt
 
-struct QuoteMapper {
-
+enum QuoteMapper {
     static func quote(map: [String: Any]) throws -> Quote {
         guard let fromTokenMap = map["fromToken"] as? [String: Any],
-              let toTokenMap = map["toToken"] as? [String: Any] else {
+              let toTokenMap = map["toToken"] as? [String: Any]
+        else {
             throw ResponseError.invalidJson
         }
 
@@ -13,26 +13,23 @@ struct QuoteMapper {
 
         guard let toAmountString = map["toAmount"] as? String,
               let toAmount = BigUInt(toAmountString, radix: 10),
-              let estimateGas = map["gas"] as? Int else {
+              let estimateGas = map["gas"] as? Int
+        else {
             throw ResponseError.invalidJson
         }
 
-
         return Quote(
-                fromToken: fromToken,
-                toToken: toToken,
-                toTokenAmount: toAmount,
-                route: [],                      // todo: parse "protocols"
-                estimateGas: estimateGas
+            fromToken: fromToken,
+            toToken: toToken,
+            toTokenAmount: toAmount,
+            route: [], // TODO: parse "protocols"
+            estimateGas: estimateGas
         )
     }
-
 }
 
 extension QuoteMapper {
-
     public enum ResponseError: Error {
         case invalidJson
     }
-
 }

@@ -1,3 +1,3 @@
 import EvmKit
 
-class UnparsedSwapMethodV5: ContractMethod { }
+class UnparsedSwapMethodV5: ContractMethod {}

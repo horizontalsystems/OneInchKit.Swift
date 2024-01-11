@@ -1,6 +1,6 @@
-import Foundation
 import BigInt
 import EvmKit
+import Foundation
 
 class UnparsedSwapMethodsFactoryV4: IContractMethodsFactory {
     var methodId: Data { Data() }
@@ -14,11 +14,10 @@ class UnparsedSwapMethodsFactoryV4: IContractMethodsFactory {
         ContractMethodHelper.methodId(signature: "uniswapV3Swap(uint256,uint256,uint256[])"),
         ContractMethodHelper.methodId(signature: "uniswapV3SwapTo(address,uint256,uint256,uint256[])"),
         ContractMethodHelper.methodId(signature: "uniswapV3SwapToWithPermit(address,address,uint256,uint256,uint256[],bytes)"),
-        ContractMethodHelper.methodId(signature: "unoswapWithPermit(address,uint256,uint256,bytes32[],bytes)")
+        ContractMethodHelper.methodId(signature: "unoswapWithPermit(address,uint256,uint256,bytes32[],bytes)"),
     ]
 
-    func createMethod(inputArguments: Data) throws -> ContractMethod {
+    func createMethod(inputArguments _: Data) throws -> ContractMethod {
         UnparsedSwapMethodV4()
     }
-
 }

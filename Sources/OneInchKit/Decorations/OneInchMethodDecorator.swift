@@ -1,5 +1,5 @@
-import Foundation
 import EvmKit
+import Foundation
 
 class OneInchMethodDecorator {
     private let contractMethodFactories: OneInchContractMethodFactories
@@ -7,13 +7,10 @@ class OneInchMethodDecorator {
     init(contractMethodFactories: OneInchContractMethodFactories) {
         self.contractMethodFactories = contractMethodFactories
     }
-
 }
 
 extension OneInchMethodDecorator: IMethodDecorator {
-
     public func contractMethod(input: Data) -> ContractMethod? {
         contractMethodFactories.createMethod(input: input)
     }
-
 }

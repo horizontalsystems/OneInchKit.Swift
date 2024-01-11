@@ -1,6 +1,6 @@
-import Foundation
 import BigInt
 import EvmKit
+import Foundation
 
 class SwapMethodV4: ContractMethod {
     static let methodSignature = "swap(address,(address,address,address,address,uint256,uint256,uint256,bytes),bytes)"
@@ -33,5 +33,4 @@ class SwapMethodV4: ContractMethod {
         let flags: BigUInt
         let permit: Data
     }
-
 }

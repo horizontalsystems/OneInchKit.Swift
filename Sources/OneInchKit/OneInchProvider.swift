@@ -1,15 +1,15 @@
-import Foundation
+import Alamofire
 import BigInt
 import EvmKit
+import Foundation
 import HsToolKit
-import Alamofire
 
 class OneInchProvider {
     private static let notEnoughEthErrors = [
         "Try to leave the buffer of ETH for gas",
         "you may not have enough ETH balance for gas fee",
         "Not enough ETH balance",
-        "insufficient funds for transfer"
+        "insufficient funds for transfer",
     ]
 
     private let networkManager: NetworkManager
@@ -26,10 +26,10 @@ class OneInchProvider {
         var result = [String: Any]()
 
         dictionary.forEach { key, value in
-                    if let value = value {
-                        result[key] = value
-                    }
-                }
+            if let value {
+                result[key] = value
+            }
+        }
 
         return result
     }
@@ -41,35 +41,33 @@ class OneInchProvider {
 
         return false
     }
-
 }
 
 extension OneInchProvider {
-
     func quote(chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
                connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
-               includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true
-    ) async throws -> Quote {
-       var parameters = params(dictionary:
-       [
-           "src": fromToken,
-           "dst": toToken,
-           "amount": amount.description,
-           "protocols": protocols,
-           "connectorTokens": connectorTokens,
-           "complexityLevel": complexityLevel,
-           "gasLimit": gasLimit,
-           "mainRouteParts": mainRouteParts,
-           "parts": parts,
-           "includeTokensInfo": includeTokensInfo,
-           "includeProtocols": includeProtocols,
-           "includeGas": includeGas
-       ])
+               includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true) async throws -> Quote
+    {
+        var parameters = params(dictionary:
+            [
+                "src": fromToken,
+                "dst": toToken,
+                "amount": amount.description,
+                "protocols": protocols,
+                "connectorTokens": connectorTokens,
+                "complexityLevel": complexityLevel,
+                "gasLimit": gasLimit,
+                "mainRouteParts": mainRouteParts,
+                "parts": parts,
+                "includeTokensInfo": includeTokensInfo,
+                "includeProtocols": includeProtocols,
+                "includeGas": includeGas,
+            ])
 
         switch gasPrice {
-        case .legacy(let legacyGasPrice):
+        case let .legacy(legacyGasPrice):
             parameters["gasPrice"] = legacyGasPrice
-        case .eip1559(let maxFeePerGas, let maxPriorityFeePerGas):
+        case let .eip1559(maxFeePerGas, maxPriorityFeePerGas):
             parameters["maxFeePerGas"] = maxFeePerGas
             parameters["maxPriorityFeePerGas"] = maxPriorityFeePerGas
         case .none: ()
@@ -87,7 +85,8 @@ extension OneInchProvider {
             if let responseError = error as? NetworkManager.ResponseError,
                let dictionary = responseError.json as? [String: Any],
                let message = dictionary["message"] as? String,
-               message.contains("insufficient liquidity") {
+               message.contains("insufficient liquidity")
+            {
                 throw Kit.QuoteError.insufficientLiquidity
             }
 
@@ -98,34 +97,34 @@ extension OneInchProvider {
     func swap(chain: Chain, fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, referrer: String? = nil, protocols: String? = nil,
               recipient: String? = nil, gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: String? = nil,
               allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
-              includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true
-    ) async throws -> Swap {
-       var parameters = params(dictionary:
-       [
-           "src": fromToken,
-           "dst": toToken,
-           "amount": amount.description,
-           "from": fromAddress,
-           "slippage": slippage,
-           "referrer": referrer,
-           "protocols": protocols,
-           "receiver": recipient,
-           "burnChi": burnChi,
-           "complexityLevel": complexityLevel,
-           "connectorTokens": connectorTokens,
-           "allowPartialFill": allowPartialFill,
-           "gasLimit": gasLimit,
-           "mainRouteParts": mainRouteParts,
-           "parts": parts,
-           "includeTokensInfo": includeTokensInfo,
-           "includeProtocols": includeProtocols,
-           "includeGas": includeGas
-       ])
+              includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true) async throws -> Swap
+    {
+        var parameters = params(dictionary:
+            [
+                "src": fromToken,
+                "dst": toToken,
+                "amount": amount.description,
+                "from": fromAddress,
+                "slippage": slippage,
+                "referrer": referrer,
+                "protocols": protocols,
+                "receiver": recipient,
+                "burnChi": burnChi,
+                "complexityLevel": complexityLevel,
+                "connectorTokens": connectorTokens,
+                "allowPartialFill": allowPartialFill,
+                "gasLimit": gasLimit,
+                "mainRouteParts": mainRouteParts,
+                "parts": parts,
+                "includeTokensInfo": includeTokensInfo,
+                "includeProtocols": includeProtocols,
+                "includeGas": includeGas,
+            ])
 
         switch gasPrice {
-        case .legacy(let legacyGasPrice):
+        case let .legacy(legacyGasPrice):
             parameters["gasPrice"] = legacyGasPrice
-        case .eip1559(let maxFeePerGas, let maxPriorityFeePerGas):
+        case let .eip1559(maxFeePerGas, maxPriorityFeePerGas):
             parameters["maxFeePerGas"] = maxFeePerGas
             parameters["maxPriorityFeePerGas"] = maxPriorityFeePerGas
         case .none: ()
@@ -142,7 +141,8 @@ extension OneInchProvider {
         } catch {
             if let responseError = error as? NetworkManager.ResponseError,
                let dictionary = responseError.json as? [String: Any],
-               let message = dictionary["message"] as? String {
+               let message = dictionary["message"] as? String
+            {
                 if Self.notEnoughErrorContains(in: message) {
                     throw Kit.SwapError.notEnough
                 } else if message.contains("cannot estimate") {
@@ -153,13 +153,10 @@ extension OneInchProvider {
             throw error
         }
     }
-
 }
 
 extension OneInchProvider {
-
     public enum ResponseError: Error {
         case invalidJson
     }
-
 }

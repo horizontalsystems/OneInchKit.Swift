@@ -14,5 +14,4 @@ class OneInchContractMethodFactories: ContractMethodFactories {
             UnparsedSwapMethodsFactoryV5(),
         ])
     }
-
 }
