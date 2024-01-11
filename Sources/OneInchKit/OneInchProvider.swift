@@ -13,14 +13,11 @@ class OneInchProvider {
     ]
 
     private let networkManager: NetworkManager
-    private let chain: Chain
-
     private var url: String { "https://api.1inch.dev/swap/" }
     private var headers: HTTPHeaders?
 
-    init(networkManager: NetworkManager, chain: Chain, apiKey: String) {
+    init(networkManager: NetworkManager, apiKey: String) {
         self.networkManager = networkManager
-        self.chain = chain
 
         headers = HTTPHeaders([HTTPHeader.authorization(bearerToken: apiKey)])
     }
@@ -49,7 +46,7 @@ class OneInchProvider {
 
 extension OneInchProvider {
 
-    func quote(fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
+    func quote(chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
                connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
                includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true
     ) async throws -> Quote {
@@ -98,7 +95,7 @@ extension OneInchProvider {
         }
     }
 
-    func swap(fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, referrer: String? = nil, protocols: String? = nil,
+    func swap(chain: Chain, fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, referrer: String? = nil, protocols: String? = nil,
               recipient: String? = nil, gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: String? = nil,
               allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
               includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true
