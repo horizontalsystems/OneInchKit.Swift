@@ -12,13 +12,10 @@ public struct Token {
         self.address = address
         self.logoUri = logoUri
     }
-
 }
 
 extension Token: CustomStringConvertible {
-
     public var description: String {
         "[symbol: \(symbol); name: \(name); decimals: \(decimals.description); decimals: \(address)]"
     }
-
 }

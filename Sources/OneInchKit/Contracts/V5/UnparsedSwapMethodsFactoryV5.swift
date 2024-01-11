@@ -1,6 +1,6 @@
-import Foundation
 import BigInt
 import EvmKit
+import Foundation
 
 class UnparsedSwapMethodsFactoryV5: IContractMethodsFactory {
     var methodId: Data { Data() }
@@ -20,11 +20,10 @@ class UnparsedSwapMethodsFactoryV5: IContractMethodsFactory {
         hexToData("0xbc80f1a8"), // uniswapV3SwapTo
         hexToData("0x2521b930"), // uniswapV3SwapToWithPermit
         hexToData("0xf78dc253"), // unoswapTo
-        hexToData("0x3c15fd91")  // unoswapToWithPermit
-
+        hexToData("0x3c15fd91"), // unoswapToWithPermit
     ]
 
-    func createMethod(inputArguments: Data) throws -> ContractMethod {
+    func createMethod(inputArguments _: Data) throws -> ContractMethod {
         UnparsedSwapMethodV5()
     }
 
@@ -43,5 +42,4 @@ class UnparsedSwapMethodsFactoryV5: IContractMethodsFactory {
 
         return Data([UInt8(n1, radix: 16) ?? 0, UInt8(n2, radix: 16) ?? 0, UInt8(n3, radix: 16) ?? 0, UInt8(n4, radix: 16) ?? 0])
     }
-
 }

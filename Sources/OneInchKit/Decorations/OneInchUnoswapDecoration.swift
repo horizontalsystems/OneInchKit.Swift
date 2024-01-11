@@ -1,6 +1,6 @@
-import Foundation
 import BigInt
 import EvmKit
+import Foundation
 
 public class OneInchUnoswapDecoration: OneInchDecoration {
     public let tokenIn: Token
@@ -19,18 +19,17 @@ public class OneInchUnoswapDecoration: OneInchDecoration {
         super.init(contractAddress: contractAddress)
     }
 
-    public override func tags() -> [TransactionTag] {
+    override public func tags() -> [TransactionTag] {
         var tags = [TransactionTag]()
 
         tags.append(tag(token: tokenIn, type: .swap))
         tags.append(tag(token: tokenIn, type: .outgoing))
 
-        if let tokenOut = tokenOut {
+        if let tokenOut {
             tags.append(tag(token: tokenOut, type: .swap))
             tags.append(tag(token: tokenOut, type: .incoming))
         }
 
         return tags
     }
-
 }

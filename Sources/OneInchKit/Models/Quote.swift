@@ -1,5 +1,5 @@
-import Foundation
 import BigInt
+import Foundation
 
 public struct Quote {
     public let fromToken: Token
@@ -15,21 +15,16 @@ public struct Quote {
         self.route = route
         self.estimateGas = estimateGas
     }
-
 }
 
 extension Quote: CustomStringConvertible {
-
     public var description: String {
         "[Quote {fromToken:\(fromToken.name) - toToken:\(toToken.name); toAmount: \(toTokenAmount.description)]"
     }
-
 }
 
-extension Quote {
-
-    public var amountOut: Decimal? {
+public extension Quote {
+    var amountOut: Decimal? {
         toTokenAmount.toDecimal(decimals: toToken.decimals)
     }
-
 }

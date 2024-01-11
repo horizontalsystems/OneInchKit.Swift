@@ -1,15 +1,15 @@
-import Foundation
 import BigInt
 import EvmKit
+import Foundation
 
 class SwapMethodFactoryV4: IContractMethodFactory {
     let methodId: Data = ContractMethodHelper.methodId(signature: SwapMethodV4.methodSignature)
 
     func createMethod(inputArguments: Data) throws -> ContractMethod {
-        let argumentTypes: [Any] =  [
+        let argumentTypes: [Any] = [
             Address.self,
             ContractMethodHelper.DynamicStructParameter([Address.self, Address.self, Address.self, Address.self, BigUInt.self, BigUInt.self, BigUInt.self, Data.self]),
-            Data.self
+            Data.self,
         ]
         let parsedArguments = ContractMethodHelper.decodeABI(inputArguments: inputArguments, argumentTypes: argumentTypes)
 
@@ -25,22 +25,22 @@ class SwapMethodFactoryV4: IContractMethodFactory {
               let flags = swapDescriptionArguments[6] as? BigUInt,
               let permit = swapDescriptionArguments[7] as? Data,
 
-              let data = parsedArguments[2] as? Data else {
+              let data = parsedArguments[2] as? Data
+        else {
             throw ContractMethodFactories.DecodeError.invalidABI
         }
 
         let swapDescription = SwapMethodV4.SwapDescription(
-                srcToken: srcToken,
-                dstToken: dstToken,
-                srcReceiver: srcReceiver,
-                dstReceiver: dstReceiver,
-                amount: amount,
-                minReturnAmount: minReturnAmount,
-                flags: flags,
-                permit: permit
+            srcToken: srcToken,
+            dstToken: dstToken,
+            srcReceiver: srcReceiver,
+            dstReceiver: dstReceiver,
+            amount: amount,
+            minReturnAmount: minReturnAmount,
+            flags: flags,
+            permit: permit
         )
 
         return SwapMethodV4(caller: caller, swapDescription: swapDescription, data: data)
     }
-
 }

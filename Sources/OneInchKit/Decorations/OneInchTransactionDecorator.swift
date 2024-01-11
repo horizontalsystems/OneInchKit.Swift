@@ -1,6 +1,6 @@
 import BigInt
-import EvmKit
 import Eip20Kit
+import EvmKit
 
 class OneInchTransactionDecorator {
     private static let ethTokenAddresses = ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "0x0000000000000000000000000000000000000000"]
@@ -64,13 +64,11 @@ class OneInchTransactionDecorator {
             return .eip20Coin(address: address, tokenInfo: eventInstances.compactMap { $0 as? TransferEventInstance }.first { $0.contractAddress == address }?.tokenInfo)
         }
     }
-
 }
 
 extension OneInchTransactionDecorator: ITransactionDecorator {
-
     public func decoration(from: Address?, to: Address?, value: BigUInt?, contractMethod: ContractMethod?, internalTransactions: [InternalTransaction], eventInstances: [ContractEventInstance]) -> TransactionDecoration? {
-        guard let from = from, let to = to, let value = value, let contractMethod = contractMethod else {
+        guard let from, let to, let value, let contractMethod else {
             return nil
         }
 
@@ -94,15 +92,15 @@ extension OneInchTransactionDecorator: ITransactionDecorator {
             }
 
             return OneInchSwapDecoration(
-                    contractAddress: to,
-                    tokenIn: addressToToken(address: swapDescription.srcToken, eventInstances: eventInstances),
-                    tokenOut: tokenOut,
-                    amountIn: swapDescription.amount,
-                    amountOut: amountOut,
-                    flags: swapDescription.flags,
-                    permit: swapDescription.permit,
-                    data: method.data,
-                    recipient: swapDescription.dstReceiver == from ? nil : swapDescription.dstReceiver
+                contractAddress: to,
+                tokenIn: addressToToken(address: swapDescription.srcToken, eventInstances: eventInstances),
+                tokenOut: tokenOut,
+                amountIn: swapDescription.amount,
+                amountOut: amountOut,
+                flags: swapDescription.flags,
+                permit: swapDescription.permit,
+                data: method.data,
+                recipient: swapDescription.dstReceiver == from ? nil : swapDescription.dstReceiver
             )
 
         case let method as UnoswapMethodV4:
@@ -129,12 +127,12 @@ extension OneInchTransactionDecorator: ITransactionDecorator {
             }
 
             return OneInchUnoswapDecoration(
-                    contractAddress: to,
-                    tokenIn: addressToToken(address: method.srcToken, eventInstances: eventInstances),
-                    tokenOut: tokenOut,
-                    amountIn: method.amount,
-                    amountOut: amountOut,
-                    params: method.params
+                contractAddress: to,
+                tokenIn: addressToToken(address: method.srcToken, eventInstances: eventInstances),
+                tokenOut: tokenOut,
+                amountIn: method.amount,
+                amountOut: amountOut,
+                params: method.params
             )
 
         case let method as SwapMethodV5:
@@ -156,15 +154,15 @@ extension OneInchTransactionDecorator: ITransactionDecorator {
             }
 
             return OneInchSwapDecoration(
-                    contractAddress: to,
-                    tokenIn: addressToToken(address: swapDescription.srcToken, eventInstances: eventInstances),
-                    tokenOut: tokenOut,
-                    amountIn: swapDescription.amount,
-                    amountOut: amountOut,
-                    flags: swapDescription.flags,
-                    permit: method.permit,
-                    data: method.data,
-                    recipient: swapDescription.dstReceiver == from ? nil : swapDescription.dstReceiver
+                contractAddress: to,
+                tokenIn: addressToToken(address: swapDescription.srcToken, eventInstances: eventInstances),
+                tokenOut: tokenOut,
+                amountIn: swapDescription.amount,
+                amountOut: amountOut,
+                flags: swapDescription.flags,
+                permit: method.permit,
+                data: method.data,
+                recipient: swapDescription.dstReceiver == from ? nil : swapDescription.dstReceiver
             )
 
         case let method as UnoswapMethodV5:
@@ -191,12 +189,12 @@ extension OneInchTransactionDecorator: ITransactionDecorator {
             }
 
             return OneInchUnoswapDecoration(
-                    contractAddress: to,
-                    tokenIn: addressToToken(address: method.srcToken, eventInstances: eventInstances),
-                    tokenOut: tokenOut,
-                    amountIn: method.amount,
-                    amountOut: amountOut,
-                    params: []
+                contractAddress: to,
+                tokenIn: addressToToken(address: method.srcToken, eventInstances: eventInstances),
+                tokenOut: tokenOut,
+                amountIn: method.amount,
+                amountOut: amountOut,
+                params: []
             )
 
         case is UnparsedSwapMethodV4, is UnparsedSwapMethodV5:
@@ -228,13 +226,12 @@ extension OneInchTransactionDecorator: ITransactionDecorator {
             }
 
             return OneInchUnknownSwapDecoration(
-                    contractAddress: to,
-                    tokenAmountIn: tokenAmountIn,
-                    tokenAmountOut: tokenAmountOut
+                contractAddress: to,
+                tokenAmountIn: tokenAmountIn,
+                tokenAmountOut: tokenAmountOut
             )
 
         default: return nil
         }
     }
-
 }
