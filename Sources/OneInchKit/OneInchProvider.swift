@@ -12,20 +12,17 @@ class OneInchProvider {
         "insufficient funds for transfer",
     ]
 
-    private let networkManager: NetworkManager
     private var url: String { "https://api.1inch.dev/swap/" }
     private var headers: HTTPHeaders?
 
-    init(networkManager: NetworkManager, apiKey: String) {
-        self.networkManager = networkManager
-
+    init(apiKey: String) {
         headers = HTTPHeaders([HTTPHeader.authorization(bearerToken: apiKey)])
     }
 
     private func params(dictionary: [String: Any?]) -> [String: Any] {
         var result = [String: Any]()
 
-        dictionary.forEach { key, value in
+        for (key, value) in dictionary {
             if let value {
                 result[key] = value
             }
@@ -44,7 +41,7 @@ class OneInchProvider {
 }
 
 extension OneInchProvider {
-    func quote(chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
+    func quote(networkManager: NetworkManager, chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
                connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
                includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true) async throws -> Quote
     {
@@ -94,7 +91,7 @@ extension OneInchProvider {
         }
     }
 
-    func swap(chain: Chain, fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, referrer: String? = nil, protocols: String? = nil,
+    func swap(networkManager: NetworkManager, chain: Chain, fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, referrer: String? = nil, protocols: String? = nil,
               recipient: String? = nil, gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: String? = nil,
               allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
               includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true) async throws -> Swap

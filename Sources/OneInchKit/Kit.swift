@@ -12,10 +12,11 @@ public class Kit {
 }
 
 public extension Kit {
-    func quote(chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
+    func quote(networkManager: NetworkManager, chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
                connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil) async throws -> Quote
     {
         try await provider.quote(
+            networkManager: networkManager,
             chain: chain,
             fromToken: fromToken,
             toToken: toToken,
@@ -30,11 +31,12 @@ public extension Kit {
         )
     }
 
-    func swap(chain: Chain, receiveAddress: Address, fromToken: Address, toToken: Address, amount: BigUInt, slippage: Decimal, protocols: [String]? = nil, recipient: Address? = nil,
+    func swap(networkManager: NetworkManager, chain: Chain, receiveAddress: Address, fromToken: Address, toToken: Address, amount: BigUInt, slippage: Decimal, protocols: [String]? = nil, recipient: Address? = nil,
               gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: [String]? = nil,
               allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil) async throws -> Swap
     {
         try await provider.swap(
+            networkManager: networkManager,
             chain: chain,
             fromToken: fromToken.hex,
             toToken: toToken.hex,
@@ -56,13 +58,8 @@ public extension Kit {
 }
 
 public extension Kit {
-    static func instance(apiKey: String, minLogLevel: Logger.Level = .error) throws -> Kit {
-        let logger = Logger(minLogLevel: minLogLevel)
-        let networkManager = NetworkManager(logger: logger)
-
-        let oneInchKit = Kit(provider: OneInchProvider(networkManager: networkManager, apiKey: apiKey))
-
-        return oneInchKit
+    static func instance(apiKey: String) -> Kit {
+        Kit(provider: OneInchProvider(apiKey: apiKey))
     }
 
     static func addDecorators(to evmKit: EvmKit.Kit) {
