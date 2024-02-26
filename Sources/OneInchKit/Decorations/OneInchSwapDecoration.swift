@@ -28,10 +28,12 @@ public class OneInchSwapDecoration: OneInchDecoration {
     override public func tags() -> [TransactionTag] {
         var tags = [TransactionTag]()
 
-        tags.append(tag(token: tokenIn, type: .swap))
-        tags.append(tag(token: tokenOut, type: .swap))
+        let addresses = recipient.map { [$0.hex] } ?? []
 
-        tags.append(tag(token: tokenIn, type: .outgoing))
+        tags.append(tag(token: tokenIn, type: .swap, addresses: addresses))
+        tags.append(tag(token: tokenOut, type: .swap, addresses: addresses))
+
+        tags.append(tag(token: tokenIn, type: .outgoing, addresses: addresses))
 
         if recipient == nil {
             tags.append(tag(token: tokenOut, type: .incoming))
