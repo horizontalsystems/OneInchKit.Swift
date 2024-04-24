@@ -41,7 +41,8 @@ class OneInchProvider {
 }
 
 extension OneInchProvider {
-    func quote(networkManager: NetworkManager, chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
+    func quote(networkManager: NetworkManager, chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt,
+               fee: Decimal? = nil, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
                connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
                includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true) async throws -> Quote
     {
@@ -59,6 +60,7 @@ extension OneInchProvider {
                 "includeTokensInfo": includeTokensInfo,
                 "includeProtocols": includeProtocols,
                 "includeGas": includeGas,
+                "fee": fee,
             ])
 
         switch gasPrice {
@@ -91,7 +93,8 @@ extension OneInchProvider {
         }
     }
 
-    func swap(networkManager: NetworkManager, chain: Chain, fromToken: String, toToken: String, amount: BigUInt, fromAddress: String, slippage: Decimal, referrer: String? = nil, protocols: String? = nil,
+    func swap(networkManager: NetworkManager, chain: Chain, fromToken: String, toToken: String, amount: BigUInt, fromAddress: String,
+              slippage: Decimal, referrer: String? = nil, fee: Decimal? = nil, protocols: String? = nil,
               recipient: String? = nil, gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: String? = nil,
               allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
               includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true) async throws -> Swap
@@ -116,6 +119,7 @@ extension OneInchProvider {
                 "includeTokensInfo": includeTokensInfo,
                 "includeProtocols": includeProtocols,
                 "includeGas": includeGas,
+                "fee": fee,
             ])
 
         switch gasPrice {
@@ -126,7 +130,6 @@ extension OneInchProvider {
             parameters["maxPriorityFeePerGas"] = maxPriorityFeePerGas
         case .none: ()
         }
-
         do {
             let json = try await networkManager.fetchJson(url: url + "v5.2/\(chain.id)/swap", method: .get, parameters: parameters, headers: headers, responseCacherBehavior: .doNotCache)
 

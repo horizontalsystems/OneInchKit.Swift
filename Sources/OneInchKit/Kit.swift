@@ -12,7 +12,8 @@ public class Kit {
 }
 
 public extension Kit {
-    func quote(networkManager: NetworkManager, chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
+    func quote(networkManager: NetworkManager, chain: Chain, fromToken: Address, toToken: Address, amount: BigUInt,
+               fee: Decimal? = nil, protocols: String? = nil, gasPrice: GasPrice? = nil, complexityLevel: Int? = nil,
                connectorTokens: String? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil) async throws -> Quote
     {
         try await provider.quote(
@@ -21,6 +22,7 @@ public extension Kit {
             fromToken: fromToken,
             toToken: toToken,
             amount: amount,
+            fee: fee,
             protocols: protocols,
             gasPrice: gasPrice,
             complexityLevel: complexityLevel,
@@ -31,7 +33,8 @@ public extension Kit {
         )
     }
 
-    func swap(networkManager: NetworkManager, chain: Chain, receiveAddress: Address, fromToken: Address, toToken: Address, amount: BigUInt, slippage: Decimal, protocols: [String]? = nil, recipient: Address? = nil,
+    func swap(networkManager: NetworkManager, chain: Chain, receiveAddress: Address, fromToken: Address, toToken: Address,
+              amount: BigUInt, slippage: Decimal, referrer: String? = nil, fee: Decimal? = nil, protocols: [String]? = nil, recipient: Address? = nil,
               gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: [String]? = nil,
               allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil) async throws -> Swap
     {
@@ -43,6 +46,8 @@ public extension Kit {
             amount: amount,
             fromAddress: receiveAddress.hex,
             slippage: slippage,
+            referrer: referrer,
+            fee: fee,
             protocols: protocols?.joined(separator: ","),
             recipient: recipient?.hex,
             gasPrice: gasPrice,
