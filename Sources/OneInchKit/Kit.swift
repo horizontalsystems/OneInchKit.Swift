@@ -36,7 +36,7 @@ public extension Kit {
     func swap(networkManager: NetworkManager, chain: Chain, receiveAddress: Address, fromToken: Address, toToken: Address,
               amount: BigUInt, slippage: Decimal, referrer: String? = nil, fee: Decimal? = nil, protocols: [String]? = nil, recipient: Address? = nil,
               gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: [String]? = nil,
-              allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil) async throws -> Swap
+              allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil, disableEstimate: Bool? = nil) async throws -> Swap
     {
         try await provider.swap(
             networkManager: networkManager,
@@ -57,7 +57,8 @@ public extension Kit {
             allowPartialFill: allowPartialFill,
             gasLimit: gasLimit,
             mainRouteParts: mainRouteParts,
-            parts: parts
+            parts: parts,
+            disableEstimate: disableEstimate
         )
     }
 }

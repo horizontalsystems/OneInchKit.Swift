@@ -97,7 +97,7 @@ extension OneInchProvider {
               slippage: Decimal, referrer: String? = nil, fee: Decimal? = nil, protocols: String? = nil,
               recipient: String? = nil, gasPrice: GasPrice? = nil, burnChi: Bool? = nil, complexityLevel: Int? = nil, connectorTokens: String? = nil,
               allowPartialFill: Bool? = nil, gasLimit: Int? = nil, mainRouteParts: Int? = nil, parts: Int? = nil,
-              includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true) async throws -> Swap
+              includeTokensInfo: Bool = true, includeProtocols: Bool = true, includeGas: Bool = true, disableEstimate: Bool? = nil) async throws -> Swap
     {
         var parameters = params(dictionary:
             [
@@ -120,6 +120,7 @@ extension OneInchProvider {
                 "includeProtocols": includeProtocols,
                 "includeGas": includeGas,
                 "fee": fee,
+                "disableEstimate": disableEstimate,
             ])
 
         switch gasPrice {
